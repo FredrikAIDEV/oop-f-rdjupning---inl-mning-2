@@ -1,6 +1,8 @@
 package com.bergstrom;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -14,6 +16,18 @@ public class Main extends Application {
     //VBox mainMenu;
     private static Main instance;
     BorderPane root;
+
+    //MEMBERS
+    Member a = new Member("Sven",true);
+    Member b = new Member("Lasse",false);
+    Member c = new Member("Bosse",false);
+    Member d = new Member("Anna", false);
+
+
+
+
+
+
 
     public Main() {
         instance = this;
@@ -31,7 +45,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-
+    Item.readItem("items.txt");
+    MemberRegistry.readMember("members.txt");
     root = new BorderPane();
     root.setCenter(Menus.mainMenu());
     Scene scene = new Scene(root, 500,500);
@@ -39,6 +54,9 @@ public class Main extends Application {
     primaryStage.setScene(scene);
     primaryStage.setTitle("Inlämning 2");
     primaryStage.show();
+
+
+
 
     //LABELS
 /*
