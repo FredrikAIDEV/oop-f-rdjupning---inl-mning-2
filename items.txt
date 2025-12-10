@@ -1,0 +1,10 @@
+Tool,Hammare, 200
+Tool,Såg, 300
+Vehicle,Bil, 500
+Tool,Borr, 100
+Vehicle,Cykel, 300
+Vehicle,Moped, 400
+Tool,Kvast, 100
+Tool,Skruvmejsel, 50
+Vehicle,Buss, 1000
+Vehicle,Elcykel, 500

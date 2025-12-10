@@ -1,0 +1,6 @@
+1,Sven,true,0
+2,Lasse,false,0
+3,Bosse,false,0
+4,Anna,false,0
+5,Bert,true,0
+6,Hans,false,0
