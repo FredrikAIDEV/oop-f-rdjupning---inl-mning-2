@@ -24,6 +24,7 @@ public class MembershipService {
         Member m = MemberRegistry.findMemberId(idChange);
         if (m != null) {
             m.setName(newName);
+            MemberRegistry.writeMember("members.txt");
             System.out.println("Klart");
         }
         else {
@@ -44,7 +45,7 @@ public class MembershipService {
         Member m = MemberRegistry.findMemberId(idChange);
         if (m != null) {
             m.setStatus(newStudentBool);
-
+            MemberRegistry.writeMember("members.txt");
             System.out.println("Klart");
         }
         else {
@@ -52,11 +53,13 @@ public class MembershipService {
         }
     }
 
-    public static void totalMemberHistory() {
+    public static int totalMemberHistory() {
         int historySummary = 0;
         for (Member m : MemberRegistry.allMembers) {
             historySummary += m.getHistory();
         }
-        System.out.println("Alla medlemmars totala skuld är " + historySummary + " kr.");
+        //System.out.println("Alla medlemmars totala skuld är " + historySummary + " kr.");
+        return historySummary;
     }
+
 }

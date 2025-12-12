@@ -19,7 +19,7 @@ public class Inventory {
 
     //public static void showCurrentItems() {
     //    for (Item i: allItems) {
-    //         if(!i.hasRented() ) {
+    //         if(!i.isRented() ) {
     //             System.out.println(i);
     //        }
 
@@ -57,15 +57,16 @@ public class Inventory {
 
     // }
 
-    // public static Item findById(int id) {
-    //     for(Item i: allItems) {
-    //        if (i.getItemId() == id) {
-    //            return i;
-    //       }
-    //   }
+    public static Item findById(int id) {
+    //ÄNDRAD FRÅN "allItems"//
+            for(Item i: inventory) {
+            if (i.getItemId() == id) {
+                return i;
+          }
+       }
 
-    //   return null;
-    // }
+       return null;
+     }
 //
     //private static ObservableList<Item> inventory = FXCollections.observableArrayList();
 

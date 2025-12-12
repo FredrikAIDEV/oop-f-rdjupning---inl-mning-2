@@ -25,7 +25,7 @@ public abstract class Item implements PricePolicy {
     public int getItemId() {
         return itemId;
     }
-    public boolean hasRented() {
+    public boolean isRented() {
         return rented;
     }
 

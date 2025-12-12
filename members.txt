@@ -4,3 +4,4 @@
 4,Anna,false,0
 5,Bert,true,0
 6,Hans,false,0
+7,fredrik,false,0

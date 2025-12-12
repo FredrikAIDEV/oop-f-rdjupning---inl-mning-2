@@ -10,7 +10,7 @@ public class Member {
     public String name;
     public boolean student;
     public int history = 0;
-    //private List<Rental> memberRentals = new ArrayList<>();
+    private List<Rental> memberRentals = new ArrayList<>();
 
 
     public Member(String name, boolean student) {
@@ -56,9 +56,9 @@ public class Member {
         this.history += amount;
     }
 
-    //public void addRental(Rental r) {
-        //memberRentals.add(r);
-    //}
+    public void addRental(Rental r) {
+        memberRentals.add(r);
+    }
 
 }
 
