@@ -53,7 +53,7 @@ public class ChangeLayout {
         getRoot().setCenter(Menus.stopRentalMenu());
     }
     public static void showTotalRevenueMenu() {
-        getRoot().setCenter(Menus.stopRentalMenu());
+        getRoot().setCenter(Menus.totalRevenueMenu());
     }
 
 }

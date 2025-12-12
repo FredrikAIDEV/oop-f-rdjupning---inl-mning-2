@@ -1,12 +1,11 @@
 package com.bergstrom;
 
 import javafx.application.Platform;
-import javafx.beans.Observable;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
@@ -135,11 +134,16 @@ public class Menus {
             dynamicBox.getChildren().clear();
 
             String choice = nameOrStudent.getValue();
+            int idChange = Integer.parseInt(changeMemberField.getText());
             switch (choice) {
                 case "Namn":
                     TextField newNameField = new TextField();
                     newNameField.setPromptText("Ange Nytt namn");
                     Button confirmButton = new Button("Välj");
+                    confirmButton.setOnAction(ee -> {
+                        String newName = newNameField.getText();
+                        MembershipService.memberUpdateName(idChange,newName);
+                    });
                     dynamicBox.getChildren().addAll(newNameField,confirmButton);
                     break;
 
@@ -151,6 +155,14 @@ public class Menus {
                     boxStudent.setToggleGroup(studentGroup);
                     boxNoStudent.setToggleGroup(studentGroup);
                     Button confirmButton2 = new Button("Välj");
+                    confirmButton2.setOnAction(ee -> {
+                    String studentChoiceUpdate = "nej";
+                        if (boxStudent.isSelected()) {
+                            studentChoiceUpdate = "ja";
+                        }
+                    MembershipService.memberUpdateStudent(idChange,studentChoiceUpdate);
+
+                    });
                     dynamicBox.getChildren().addAll(studentLabel,boxStudent,boxNoStudent,confirmButton2);
 
             }
@@ -175,11 +187,13 @@ public class Menus {
         nameColumn.setPrefWidth(150);
         TableColumn<Item, Integer> priceColumn = new TableColumn<>("Pris");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        TableColumn<Item, String> isRentedColumn = new TableColumn<>("Uthyrd?");
+        isRentedColumn.setCellValueFactory(e -> new ReadOnlyStringWrapper(RentalService.getRentalStatus(e.getValue())));
         priceColumn.setPrefWidth(100);
 
         itemTable.setItems(Inventory.getInventory());
 
-        itemTable.getColumns().addAll(nameColumn,priceColumn);
+        itemTable.getColumns().addAll(nameColumn,priceColumn,isRentedColumn);
 
         Button backButton = new Button("Backa");
         backButton.setOnAction(e -> ChangeLayout.showMainMenu());
@@ -283,11 +297,48 @@ public class Menus {
         memberIdField.setPromptText("Ange ditt medlems-ID");
         TextField itemIdField = new TextField();
         itemIdField.setPromptText("Vilket föremål vill du hyra? ange ID");
+        TableView itemTable = new TableView();
+        itemTable.setPrefHeight(200);
+
+        TableColumn<Item,String> nameColumn = new TableColumn<>("Namn");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        TableColumn<Item, Integer> priceColumn = new TableColumn<>("Pris");
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        TableColumn<Item, Integer> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("itemId"));
+        nameColumn.setPrefWidth(150);
+        ObservableList<Item> rentItemList = FXCollections.observableArrayList();
+        for (Item i: Inventory.getInventory()) {
+            if (!i.isRented()) {
+                rentItemList.add(i);
+            }
+        }
+        itemTable.getColumns().clear();
+        itemTable.getColumns().addAll(nameColumn,priceColumn,idColumn);
+        itemTable.setItems(rentItemList);
+
+        Button confirmChoiceButton = new Button("Starta uthyrning");
+        confirmChoiceButton.setOnAction(e -> {
+            int memberId = Integer.parseInt(memberIdField.getText());
+            int itemId = Integer.parseInt(itemIdField.getText());
+
+            Member rentingMember = MemberRegistry.findMemberId(memberId);
+            Item rentedItem = Inventory.findById(itemId);
+
+            if (rentedItem == null) {
+                System.out.println("Fel"); //Alert
+            }
+            RentalService.rentItem(rentingMember, rentedItem);
+            System.out.println("Tack! Din nuvarande skuld är " + rentingMember.getHistory());
+
+
+        });
+
 
         Button backButton = new Button("Backa");
         backButton.setOnAction(e -> ChangeLayout.showMainMenu());
 
-        VBox startRentalBox = new VBox(20,startRentalLabel,memberIdField,itemIdField,backButton);
+        VBox startRentalBox = new VBox(20,startRentalLabel,memberIdField,itemIdField,itemTable,confirmChoiceButton,backButton);
         startRentalBox.setPadding(new Insets(20));
         return startRentalBox;
     }
@@ -296,10 +347,20 @@ public class Menus {
         TextField memberIdField = new TextField();
         memberIdField.setPromptText("Ange ditt medlems-ID");
         TextField itemIdField = new TextField();
-        itemIdField.setPromptText("Vilket föremål vill du läman tillbaka? ange ID");
+        itemIdField.setPromptText("Vilket föremål vill du lämna tillbaka? ange ID");
+
+        Button confirmCoiceButton = new Button("Lämna tillbaka");
+        confirmCoiceButton.setOnAction(e -> {
+            int memberId = Integer.parseInt(memberIdField.getText());
+            int itemReturnId = Integer.parseInt(itemIdField.getText());
+
+            Member returningMember = MemberRegistry.findMemberId(memberId);
+            RentalService.returnItem(returningMember, itemReturnId);
+        });
 
         Button backButton = new Button("Backa");
         backButton.setOnAction(e -> ChangeLayout.showMainMenu());
+
 
         VBox stopRentalBox = new VBox(20,stopRentalLabel,memberIdField,itemIdField,backButton);
         stopRentalBox.setPadding(new Insets(20));
@@ -307,11 +368,24 @@ public class Menus {
     }
     public static VBox totalRevenueMenu() {
         Label totalRevenueLabel = new Label("Alla intäkter");
+        TableView revenueTable = new TableView();
+        revenueTable.setPrefHeight(200);
+
+        TableColumn<Item,String> nameColumn = new TableColumn<>("Namn");
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        TableColumn<Member, String> debtColumn = new TableColumn<>("Skuld");
+        debtColumn.setCellValueFactory(e -> new ReadOnlyStringWrapper(String.valueOf(e.getValue().getHistory())));
+        debtColumn.setPrefWidth(120);
+        revenueTable.setItems(FXCollections.observableArrayList(MemberRegistry.allMembers));
+        revenueTable.getColumns().addAll(nameColumn,debtColumn);
+
+        int totalRevenue = MembershipService.totalMemberHistory();
+        Label totalLabel = new Label("Totala intäkter : " + totalRevenue);
 
         Button backButton = new Button("Backa");
         backButton.setOnAction(e -> ChangeLayout.showMainMenu());
 
-        VBox totalRevenueBox = new VBox(20,totalRevenueLabel,backButton);
+        VBox totalRevenueBox = new VBox(20,totalRevenueLabel,revenueTable,totalLabel,backButton);
         totalRevenueBox.setPadding(new Insets(20));
         return totalRevenueBox;
     }

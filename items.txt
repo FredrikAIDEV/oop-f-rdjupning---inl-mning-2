@@ -8,3 +8,4 @@ Tool,Kvast, 100
 Tool,Skruvmejsel, 50
 Vehicle,Buss, 1000
 Vehicle,Elcykel, 500
+Tool,Kratta, 200
