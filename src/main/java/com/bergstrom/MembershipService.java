@@ -1,5 +1,7 @@
 package com.bergstrom;
 
+import exception.InvalidMemberDataException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,7 @@ public class MembershipService {
 
     }
 
-    public static void memberUpdateName(int idChange, String newName) {
+    public static void memberUpdateName(int idChange, String newName) throws InvalidMemberDataException {
         Member m = MemberRegistry.findMemberId(idChange);
         if (m != null) {
             m.setName(newName);
@@ -34,7 +36,7 @@ public class MembershipService {
 
     }
 
-    public static void memberUpdateStudent(int idChange, String newStudentChoice) {
+    public static void memberUpdateStudent(int idChange, String newStudentChoice) throws InvalidMemberDataException {
         Boolean newStudentBool = true;
         if (newStudentChoice.equalsIgnoreCase("ja")) {
             newStudentBool = true;

@@ -1,6 +1,7 @@
 package com.bergstrom;
 
 import com.bergstrom.Member;
+import exception.InvalidMemberDataException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -15,13 +16,14 @@ public class MemberRegistry {
         allMembers.add(member);
     }
 
-    public static Member findMemberId(int id){
+    public static Member findMemberId(int id) throws InvalidMemberDataException{
+
         for(Member m: allMembers) {
             if (m.getId() == id) {
                 return m;
             }
         }
-        return null;
+        throw new InvalidMemberDataException("Ingen medlem finns på detta id: " + id);
     }
     public static void writeMember(String filePath) {
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))){
@@ -45,13 +47,16 @@ public class MemberRegistry {
                 String name = parts[1];
                 boolean student = Boolean.parseBoolean(parts[2]);
                 int history = Integer.parseInt(parts[3]);
-
-                Member m = new Member(id, name, student,history);
-                allMembers.add(m);
+                try {
+                    Member m = new Member(id, name, student, history);
+                    allMembers.add(m);
+                } catch (InvalidMemberDataException e){
+                    System.err.println("Fel medlemsdata" + e.getMessage());
+                }
             }
         }
          catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Kan inte läsa filen", e);
         }
     }
 

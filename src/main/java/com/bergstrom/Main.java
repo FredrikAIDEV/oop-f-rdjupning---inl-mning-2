@@ -1,5 +1,6 @@
 package com.bergstrom;
 
+import exception.InvalidMemberDataException;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,24 +13,15 @@ import javafx.stage.Stage;
 
 
 public class Main extends Application {
-    //Stage window;
-    //VBox mainMenu;
     private static Main instance;
     BorderPane root;
 
-    //MEMBERS
-    Member a = new Member("Sven",true);
-    Member b = new Member("Lasse",false);
-    Member c = new Member("Bosse",false);
-    Member d = new Member("Anna", false);
+    //Member a = new Member("Sven",true);
+    //Member b = new Member("Lasse",false);
+    //Member c = new Member("Bosse",false);
+    //Member d = new Member("Anna", false);
 
-
-
-
-
-
-
-    public Main() {
+    public Main() throws InvalidMemberDataException {
         instance = this;
     }
 
@@ -54,62 +46,6 @@ public class Main extends Application {
     primaryStage.setScene(scene);
     primaryStage.setTitle("Inlämning 2");
     primaryStage.show();
-
-
-
-
-    //LABELS
-/*
-
-
-
-
-
-
-
-
-    // BEHÖVS EJ?? Label quitLabel = new Label("Avsluta");
-
-
-
-    //BUTTONS
-
-
-
-
-
-
-    //TEXTFIELDS
-
-
-
-
-
-    //CHECKBOX
-
-
-
-
-    //CHOICEBOX
-
-
-
-
-
-
-    //LAYOUT
-    //VBox layoutStart = new VBox(20);
-    //layoutStart.setPadding(new Insets(20,20,20,20));
-    //layoutStart.getChildren().addAll(intro,addMemberButton,searchMemberButton,changeMemberButton,listItemButton,addItemButton,filterButton,startRentalButton,stopRentalButton,totalRevenueButton,quitButton);
-
-
-    //addMemberButton.setOnAction(e -> ChangeLayout.addMemberMenu(window));
-
-
-    //Scene scene = new Scene(layoutStart, 500, 500);
-    //window.setScene(scene);
-    //window.show();
-*/
 
     }
     public BorderPane getRoot() {
