@@ -1,5 +1,6 @@
 package com.bergstrom;
 
+import exception.InvalidMemberDataException;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -61,15 +62,23 @@ public class Menus {
         ToggleGroup studentGroup = new ToggleGroup();
         boxStudent.setToggleGroup(studentGroup);
         boxNoStudent.setToggleGroup(studentGroup);
+        boxNoStudent.setSelected(true);
 
         Button confirmChoiceButton = new Button("Registrera");
         confirmChoiceButton.setOnAction(e -> {
+            try{
             String name = regNameField.getText();
             boolean isStundet = boxStudent.isSelected();
 
             new Member(name,isStundet);
             MemberRegistry.writeMember("members.txt");
-            System.out.println("Klart");
+            AlertBox.display("Klart!", "Medlemmen är registrerad.");
+            }
+            catch(InvalidMemberDataException ex){
+                AlertBox.display("fel", ex.getMessage());
+
+            }
+
         });
 
         Button backButton = new Button("Backa");
@@ -121,52 +130,66 @@ public class Menus {
         return searchMemberBox;
     }
     public static VBox changeMemberMenu() {
-        Label changeMemberLabel = new Label("Ändra medlem");
+        Label changeMemberLabel = new Label("Ändra medlem - Ange ID");
         TextField changeMemberField = new TextField();
         changeMemberField.setPromptText("Ange ID på medlemmen som du vill ändra");
         ChoiceBox<String> nameOrStudent = new ChoiceBox<>();
         nameOrStudent.getItems().addAll("Namn","Studentstatus");
+        nameOrStudent.setValue("Namn");
         Button confirmChoiceButton = new Button("Välj");
 
         VBox dynamicBox = new VBox(10);
 
         confirmChoiceButton.setOnAction(e -> {
             dynamicBox.getChildren().clear();
+            try {
+                String choice = nameOrStudent.getValue();
+                int idChange = Integer.parseInt(changeMemberField.getText());
+                switch (choice) {
+                    case "Namn":
+                        TextField newNameField = new TextField();
+                        newNameField.setPromptText("Ange Nytt namn");
+                        Button confirmButton = new Button("Välj");
+                        confirmButton.setOnAction(ee -> {
+                            try {
+                                String newName = newNameField.getText();
+                                MembershipService.memberUpdateName(idChange, newName);
+                                AlertBox.display("Klart!", "Namnet är uppdaterat.");
+                            } catch (InvalidMemberDataException ex) {
+                                AlertBox.display("Fel", "Ingen medlem på detta ID: " + idChange);
+                            }
+                        });
+                        dynamicBox.getChildren().addAll(newNameField, confirmButton);
+                        break;
 
-            String choice = nameOrStudent.getValue();
-            int idChange = Integer.parseInt(changeMemberField.getText());
-            switch (choice) {
-                case "Namn":
-                    TextField newNameField = new TextField();
-                    newNameField.setPromptText("Ange Nytt namn");
-                    Button confirmButton = new Button("Välj");
-                    confirmButton.setOnAction(ee -> {
-                        String newName = newNameField.getText();
-                        MembershipService.memberUpdateName(idChange,newName);
-                    });
-                    dynamicBox.getChildren().addAll(newNameField,confirmButton);
-                    break;
+                    case "Studentstatus":
+                        Label studentLabel = new Label("Är du student? Studenter har 15 % rabatt på verktyg och 30 % rabatt på fordon!");
+                        RadioButton boxStudent = new RadioButton("Ja");
+                        RadioButton boxNoStudent = new RadioButton("Nej");
+                        ToggleGroup studentGroup = new ToggleGroup();
+                        boxStudent.setToggleGroup(studentGroup);
+                        boxNoStudent.setToggleGroup(studentGroup);
+                        Button confirmButton2 = new Button("Välj");
+                        confirmButton2.setOnAction(ee -> {
+                            try {
+                                String studentChoiceUpdate = "nej";
+                                if (boxStudent.isSelected()) {
+                                    studentChoiceUpdate = "ja";
+                                }
+                                MembershipService.memberUpdateStudent(idChange, studentChoiceUpdate);
+                                AlertBox.display("Klart!", "Medlemsstatusen är uppdaterad.");
+                            } catch (InvalidMemberDataException ex) {
+                                AlertBox.display("Fel", "ingen");
+                            }
+                        });
+                        dynamicBox.getChildren().addAll(studentLabel, boxStudent, boxNoStudent, confirmButton2);
 
-                case "Studentstatus":
-                    Label studentLabel = new Label("Är du student? Studenter har 15 % rabatt på verktyg och 30 % rabatt på fordon!");
-                    RadioButton boxStudent = new RadioButton("Ja");
-                    RadioButton boxNoStudent = new RadioButton("Nej");
-                    ToggleGroup studentGroup = new ToggleGroup();
-                    boxStudent.setToggleGroup(studentGroup);
-                    boxNoStudent.setToggleGroup(studentGroup);
-                    Button confirmButton2 = new Button("Välj");
-                    confirmButton2.setOnAction(ee -> {
-                    String studentChoiceUpdate = "nej";
-                        if (boxStudent.isSelected()) {
-                            studentChoiceUpdate = "ja";
-                        }
-                    MembershipService.memberUpdateStudent(idChange,studentChoiceUpdate);
-
-                    });
-                    dynamicBox.getChildren().addAll(studentLabel,boxStudent,boxNoStudent,confirmButton2);
+                }
 
             }
-
+        catch (NumberFormatException ex) {
+                AlertBox.display("Fel", "ID måste vara siffror!");
+        }
         });
 
         Button backButton = new Button("Backa");
@@ -235,6 +258,7 @@ public class Menus {
                 //Inventory.addItem(newItem);
                 Item.writeItem("items.txt");
             }
+            AlertBox.display("Klart!", "Föremålet finns nu för uthyrning");
 
         });
 
@@ -319,20 +343,26 @@ public class Menus {
 
         Button confirmChoiceButton = new Button("Starta uthyrning");
         confirmChoiceButton.setOnAction(e -> {
-            int memberId = Integer.parseInt(memberIdField.getText());
-            int itemId = Integer.parseInt(itemIdField.getText());
+                    try {
+                        int memberId = Integer.parseInt(memberIdField.getText());
+                        int itemId = Integer.parseInt(itemIdField.getText());
 
-            Member rentingMember = MemberRegistry.findMemberId(memberId);
-            Item rentedItem = Inventory.findById(itemId);
+                        Member rentingMember = MemberRegistry.findMemberId(memberId);
+                        Item rentedItem = Inventory.findById(itemId);
 
-            if (rentedItem == null) {
-                System.out.println("Fel"); //Alert
-            }
-            RentalService.rentItem(rentingMember, rentedItem);
-            System.out.println("Tack! Din nuvarande skuld är " + rentingMember.getHistory());
+                        if (rentedItem == null) {
+                            AlertBox.display("Fel", "Det finns inget föremål med detta id" + itemId);
+                            return;
+                        }
+                        RentalService.rentItem(rentingMember, rentedItem);
+                        AlertBox.display("Klart!", "Tack! Din nuvarande skuld är " + rentingMember.getHistory());
+                    } catch (NumberFormatException ex) {
+                        AlertBox.display("Fel", "ID måste vara siffror!");
+                    } catch (InvalidMemberDataException ex) {
+                        AlertBox.display("Ingen träff", "ingen träff på detta ID");
+                    }
 
-
-        });
+                });
 
 
         Button backButton = new Button("Backa");
@@ -351,18 +381,25 @@ public class Menus {
 
         Button confirmCoiceButton = new Button("Lämna tillbaka");
         confirmCoiceButton.setOnAction(e -> {
+            try {
             int memberId = Integer.parseInt(memberIdField.getText());
             int itemReturnId = Integer.parseInt(itemIdField.getText());
 
             Member returningMember = MemberRegistry.findMemberId(memberId);
             RentalService.returnItem(returningMember, itemReturnId);
-        });
+            AlertBox.display("Klart!", "Du har lämnat tillbaka föremålet.");
+        }catch (NumberFormatException ex){
+                AlertBox.display("Fel", "ID måste vara siffror!");
+            }catch (InvalidMemberDataException ex) {
+                AlertBox.display("Ingen träff", "ingen träff på detta ID");
+            }
+                });
 
         Button backButton = new Button("Backa");
         backButton.setOnAction(e -> ChangeLayout.showMainMenu());
 
 
-        VBox stopRentalBox = new VBox(20,stopRentalLabel,memberIdField,itemIdField,backButton);
+        VBox stopRentalBox = new VBox(20,stopRentalLabel,memberIdField,itemIdField,confirmCoiceButton,backButton);
         stopRentalBox.setPadding(new Insets(20));
         return stopRentalBox;
     }

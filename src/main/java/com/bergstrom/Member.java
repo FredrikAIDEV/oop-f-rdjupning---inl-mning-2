@@ -1,5 +1,7 @@
 package com.bergstrom;
 
+import exception.InvalidMemberDataException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,13 +15,22 @@ public class Member {
     private List<Rental> memberRentals = new ArrayList<>();
 
 
-    public Member(String name, boolean student) {
+    public Member(String name, boolean student) throws InvalidMemberDataException {
+        if (name == null || name.trim().isEmpty()) {
+            throw new InvalidMemberDataException("Namnet får inte vara tomt!");
+        }
+        if (!name.matches("[a-zA-ZåäöÅÄÖ\\s]")){
+            throw new InvalidMemberDataException("Namnet får bara innehålla bokstäver");
+        }
         this.id = idCounter++;
         this.name = name;
         this.student = student;
         MemberRegistry.addMember(this);
 }
-    public Member(int id, String name, boolean student, int history) {
+    public Member(int id, String name, boolean student, int history) throws InvalidMemberDataException {
+        if (name == null || name.trim().isEmpty()) {
+            throw new InvalidMemberDataException("Namnet får inte vara tomt!");
+        }
         this.id = id;
         this.name = name;
         this.student = student;
