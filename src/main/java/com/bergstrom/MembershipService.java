@@ -60,7 +60,7 @@ public class MembershipService {
         for (Member m : MemberRegistry.allMembers) {
             historySummary += m.getHistory();
         }
-        //System.out.println("Alla medlemmars totala skuld är " + historySummary + " kr.");
+
         return historySummary;
     }
 

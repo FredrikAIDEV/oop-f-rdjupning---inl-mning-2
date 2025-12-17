@@ -9,19 +9,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class ChangeLayout {
-    /*
-    public static void addMemberMenu(Stage window) {
 
-        Label addMemberLabel = new Label("Lägg till medlem");
-
-
-        VBox layoutAddMember = new VBox(20);
-        layoutAddMember.setPadding(new Insets(20,20,20,20));
-        layoutAddMember.getChildren().addAll(addMemberLabel);
-        Scene scene = new Scene(layoutAddMember, 500, 500);
-        window.setScene(scene);
-        window.show();
-*/
     private static BorderPane getRoot() {
         return Main.getInstance().getRoot();
     }
@@ -43,7 +31,7 @@ public class ChangeLayout {
     public static void showAddItemMenu() {
         getRoot().setCenter(Menus.addItemMenu());
     }
-    public static void showfilterMenu() {
+    public static void showFilterMenu() {
         getRoot().setCenter(Menus.filterMenu());
     }
     public static void showStartRentalMenu() {

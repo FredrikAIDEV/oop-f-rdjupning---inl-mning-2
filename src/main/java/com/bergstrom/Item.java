@@ -81,7 +81,6 @@ public abstract class Item implements PricePolicy {
                     case "Vehicle":
                         i = new Vehicle(name, price);
                 }
-               // Inventory.addItem(i);
             }
         }  catch (IOException e) {
             throw new RuntimeException(e);

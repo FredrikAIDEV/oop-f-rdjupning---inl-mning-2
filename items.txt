@@ -9,5 +9,3 @@ Tool,Skruvmejsel, 50
 Vehicle,Buss, 1000
 Vehicle,Elcykel, 500
 Tool,Kratta, 200
-Tool,test, 900
-Tool,9, 30

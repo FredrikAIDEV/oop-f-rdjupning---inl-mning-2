@@ -1,8 +1,7 @@
 package com.bergstrom;
 
 public class Vehicle extends Item {
-    //public String vehicleName;
-    //public int vehiclePrice;
+
 
 
     public Vehicle(String name, int price) {

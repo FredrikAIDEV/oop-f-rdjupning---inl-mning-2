@@ -37,7 +37,7 @@ public class Menus {
         changeMemberButton.setOnAction(e -> ChangeLayout.showChangeMemberMenu());
         listItemButton.setOnAction(e -> ChangeLayout.showListItemMenu());
         addItemButton.setOnAction(e -> ChangeLayout.showAddItemMenu());
-        filterButton.setOnAction(e-> ChangeLayout.showfilterMenu());
+        filterButton.setOnAction(e-> ChangeLayout.showFilterMenu());
         startRentalButton.setOnAction(e -> ChangeLayout.showStartRentalMenu());
         stopRentalButton.setOnAction(e -> ChangeLayout.showStopRentalMenu());
         totalRevenueButton.setOnAction(e -> ChangeLayout.showTotalRevenueMenu());
@@ -251,9 +251,6 @@ public class Menus {
                 if (name.isEmpty() || priceText.isEmpty()) {
                     throw new IllegalArgumentException("Fyll i alla fält!");
                 }
-                if (!name.matches("[a-zA-ZåäöÅÄÖ\\s]")){
-                    throw new IllegalArgumentException("Namnet får bara innehålla bokstäver");
-                }
                 int price;
                 try {
                     price = Integer.parseInt(priceText);
@@ -371,7 +368,7 @@ public class Menus {
                         String itemText = itemIdField.getText().trim();
 
                         if(memberText.isEmpty() || itemText.isEmpty()) {
-                            throw new IllegalArgumentException("Fyll i medlems-id och förempls-id!");
+                            throw new IllegalArgumentException("Fyll i medlems-id och föremåls-id!");
                         }
 
                         int memberId;
@@ -417,7 +414,7 @@ public class Menus {
         return startRentalBox;
     }
     public static VBox stopRentalMenu() {
-        Label stopRentalLabel = new Label("Avsluta uthyrning");
+        Label stopRentalLabel = new Label("Avsluta uthyrning - Ange ditt medlems-ID");
         TextField memberIdField = new TextField();
         memberIdField.setPromptText("Ange ditt medlems-ID");
         TextField itemIdField = new TextField();
@@ -426,11 +423,31 @@ public class Menus {
         Button confirmCoiceButton = new Button("Lämna tillbaka");
         confirmCoiceButton.setOnAction(e -> {
             try {
-            int memberId = Integer.parseInt(memberIdField.getText());
-            int itemReturnId = Integer.parseInt(itemIdField.getText());
+            String memberText = memberIdField.getText();
+            String itemText = itemIdField.getText();
+
+            if (memberText.isEmpty() || itemText.isEmpty()) {
+                throw new IllegalArgumentException("Fyll i medlems-ID och föremåls-ID!");
+            }
+
+            int memberId;
+            int itemId;
+
+            try {
+                memberId = Integer.parseInt(memberText);
+                itemId = Integer.parseInt(itemText);
+            } catch (NumberFormatException ex) {
+                throw new IllegalArgumentException("ID måste vara siffror!");
+            }
 
             Member returningMember = MemberRegistry.findMemberId(memberId);
-            RentalService.returnItem(returningMember, itemReturnId);
+            if (returningMember == null) {
+                throw new IllegalArgumentException("Det finns ingen medlem med detta ID: " + memberId);
+            }
+            if (itemId <= 0) {
+                throw new IllegalArgumentException("Ogiltigt föremåls-ID");
+            }
+            RentalService.returnItem(returningMember, itemId);
             AlertBox.display("Klart!", "Du har lämnat tillbaka föremålet.");
         }catch (NumberFormatException ex){
                 AlertBox.display("Fel", "ID måste vara siffror!");
