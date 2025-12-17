@@ -51,7 +51,7 @@ public class Menus {
         return mainMenu;
     }
     public static VBox addMemberMenu() {
-        //LÄGG TILL VALIDERING + förvalt alternativ
+
         Label addMemberLabel = new Label("Lägg till medlem");
         TextField regNameField = new TextField();
         regNameField.setPromptText("Ange ditt namn");
@@ -169,6 +169,7 @@ public class Menus {
                         ToggleGroup studentGroup = new ToggleGroup();
                         boxStudent.setToggleGroup(studentGroup);
                         boxNoStudent.setToggleGroup(studentGroup);
+                        boxNoStudent.setSelected(true);
                         Button confirmButton2 = new Button("Välj");
                         confirmButton2.setOnAction(ee -> {
                             try {
@@ -236,30 +237,51 @@ public class Menus {
         Label labelToolOrVehicle = new Label("Ange om föremålet är ett verktyg eller ett fordon");
         RadioButton boxTool = new RadioButton("Verktyg");
         RadioButton boxVehicle = new RadioButton("Fordon");
+        boxTool.setSelected(true);
         ToggleGroup itemGroup = new ToggleGroup();
         boxTool.setToggleGroup(itemGroup);
         boxVehicle.setToggleGroup(itemGroup);
         Button confirmChoiceButton = new Button("Registrera");
 
         confirmChoiceButton.setOnAction(e -> {
-            String name = regNameField.getText();
-            int price = Integer.parseInt(regPriceField.getText());
-            Item newItem = null;
-            if(boxTool.isSelected()){
+            try {
+                String name = regNameField.getText();
+                String priceText = regPriceField.getText();
 
-                newItem = new Tool(name,price);
+                if (name.isEmpty() || priceText.isEmpty()) {
+                    throw new IllegalArgumentException("Fyll i alla fält!");
+                }
+                if (!name.matches("[a-zA-ZåäöÅÄÖ\\s]")){
+                    throw new IllegalArgumentException("Namnet får bara innehålla bokstäver");
+                }
+                int price;
+                try {
+                    price = Integer.parseInt(priceText);
+                } catch (NumberFormatException ex) {
+                    throw new IllegalArgumentException("Ange ett heltal!");
+                }
+                if (price <= 0) {
+                    throw new IllegalArgumentException("Priset får inte vara 0 eller negativt!");
+                }
+                Item newItem;
+                if (boxTool.isSelected()) {
 
-            }else {
+                    newItem = new Tool(name, price);
 
-                newItem = new Vehicle(name,price);
+                } else {
 
+                    newItem = new Vehicle(name, price);
+
+                }
+                if (newItem != null) {
+                    Item.writeItem("items.txt");
+                }
+                AlertBox.display("Klart!", "Föremålet finns nu för uthyrning");
+                regNameField.clear();
+                regPriceField.clear();
+            } catch (IllegalArgumentException ex) {
+                AlertBox.display("Fel!", ex.getMessage());
             }
-            if (newItem != null) {
-                //Inventory.addItem(newItem);
-                Item.writeItem("items.txt");
-            }
-            AlertBox.display("Klart!", "Föremålet finns nu för uthyrning");
-
         });
 
 
@@ -277,6 +299,7 @@ public class Menus {
         ToggleGroup itemGroup = new ToggleGroup();
         toolBox.setToggleGroup(itemGroup);
         vehicleBox.setToggleGroup(itemGroup);
+        toolBox.setSelected(true);
         Button confirmChoiceButton = new Button("Välj");
         TableView itemTable = new TableView();
         itemTable.setPrefHeight(200);
@@ -344,22 +367,43 @@ public class Menus {
         Button confirmChoiceButton = new Button("Starta uthyrning");
         confirmChoiceButton.setOnAction(e -> {
                     try {
-                        int memberId = Integer.parseInt(memberIdField.getText());
-                        int itemId = Integer.parseInt(itemIdField.getText());
+                        String memberText = memberIdField.getText().trim();
+                        String itemText = itemIdField.getText().trim();
+
+                        if(memberText.isEmpty() || itemText.isEmpty()) {
+                            throw new IllegalArgumentException("Fyll i medlems-id och förempls-id!");
+                        }
+
+                        int memberId;
+                        int itemId;
+
+                        try {
+                            memberId = Integer.parseInt(memberText);
+                            itemId = Integer.parseInt(itemText);
+                        } catch (NumberFormatException ex) {
+                            throw new IllegalArgumentException("Ange siffror!");
+                        }
 
                         Member rentingMember = MemberRegistry.findMemberId(memberId);
-                        Item rentedItem = Inventory.findById(itemId);
-
-                        if (rentedItem == null) {
-                            AlertBox.display("Fel", "Det finns inget föremål med detta id" + itemId);
-                            return;
+                        if (rentingMember == null) {
+                            throw new IllegalArgumentException("Det finns ingen medlem med detta ID " + memberId);
                         }
+                        if (itemId <= 0) {
+                            throw new IllegalArgumentException("Föremålet existerar inte");
+                        }
+                        Item rentedItem = Inventory.findById(itemId);
+                        if (rentedItem == null) {
+                            throw new IllegalArgumentException("Det finns inget föremål med detta ID " + itemId);
+                        }
+
+                        if (rentedItem.isRented()) {
+                            throw new IllegalArgumentException("Föremålet är redan uthyrt");
+                        }
+
                         RentalService.rentItem(rentingMember, rentedItem);
                         AlertBox.display("Klart!", "Tack! Din nuvarande skuld är " + rentingMember.getHistory());
-                    } catch (NumberFormatException ex) {
-                        AlertBox.display("Fel", "ID måste vara siffror!");
-                    } catch (InvalidMemberDataException ex) {
-                        AlertBox.display("Ingen träff", "ingen träff på detta ID");
+                    } catch (IllegalArgumentException | InvalidMemberDataException ex) {
+                        AlertBox.display("Fel", ex.getMessage());
                     }
 
                 });

@@ -16,11 +16,6 @@ public class Main extends Application {
     private static Main instance;
     BorderPane root;
 
-    //Member a = new Member("Sven",true);
-    //Member b = new Member("Lasse",false);
-    //Member c = new Member("Bosse",false);
-    //Member d = new Member("Anna", false);
-
     public Main() throws InvalidMemberDataException {
         instance = this;
     }
