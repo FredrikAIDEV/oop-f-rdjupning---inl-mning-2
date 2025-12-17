@@ -19,9 +19,7 @@ public class Member {
         if (name == null || name.trim().isEmpty()) {
             throw new InvalidMemberDataException("Namnet får inte vara tomt!");
         }
-        if (!name.matches("[a-zA-ZåäöÅÄÖ\\s]")){
-            throw new InvalidMemberDataException("Namnet får bara innehålla bokstäver");
-        }
+
         this.id = idCounter++;
         this.name = name;
         this.student = student;

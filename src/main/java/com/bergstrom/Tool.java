@@ -1,8 +1,7 @@
 package com.bergstrom;
 
 public class Tool extends Item {
-    //public String toolName;
-    //public int toolPrice;
+
 
 
     public Tool (String name, int price) {

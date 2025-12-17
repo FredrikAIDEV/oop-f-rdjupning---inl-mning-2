@@ -16,13 +16,13 @@ public class Main extends Application {
     private static Main instance;
     BorderPane root;
 
-    public Main() throws InvalidMemberDataException {
+    public Main() {
         instance = this;
     }
 
     public static Main getInstance(){
         return instance;
-    };
+    }
 
     public static void main(String[] args) {
     launch(args);
@@ -44,6 +44,7 @@ public class Main extends Application {
 
     }
     public BorderPane getRoot() {
+
         return root;
     }
 
